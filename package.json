@@ -50,7 +50,6 @@
     "ansi-gray": "^0.1.1",
     "ansi-green": "^0.1.1",
     "ansi-red": "^0.1.1",
-    "array-unique": "^0.2.1",
     "ask-for-github-auth": "^0.3.0",
     "async": "^1.4.2",
     "component-emitter": "^1.2.0",
