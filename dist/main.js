@@ -100,6 +100,7 @@ module.exports =
 	 *
 	 * @param  {Object} `pkg` Object representing the package.json to update.
 	 * @param  {Object} `options` Options to use for github authentication.
+	 * @param  {Object} `options.creds` Github credentials. May be a token or a username and password. If execuled [ask-for-github-auth][] will be used.
 	 * @param {Function} `cb` Callback function that will get an `err` when an error happens or a `results` with the updated package.json object.
 	 * @api public
 	 * @name update
@@ -119,7 +120,14 @@ module.exports =
 	  if (!repo) return cb(new Error('Invalid repository property.'));
 	  _async2['default'].waterfall([
 	  // ask for creds
-	  _async2['default'].apply(_askForGithubAuth2['default'], { store: store }),
+	  function (next) {
+	    if (options.creds) {
+	      var creds = options.creds;
+	      delete options.creds;
+	      return next(null, creds);
+	    }
+	    (0, _askForGithubAuth2['default'])({ store: store }, next);
+	  },
 	
 	  // update creds on options
 	  function (creds, next) {
@@ -133,8 +141,7 @@ module.exports =
 	  // get contributor information
 	  function (contributors, next) {
 	    var github = new _githubBase2['default'](options);
-	    pkg.contributors = pkg.contributors || [];
-	    pkg.contributors = Array.isArray(pkg.contributors) ? pkg.contributors : pkg.contributors;
+	    pkg.contributors = [];
 	    _async2['default'].eachSeries(contributors, function (contributor, nextContributor) {
 	      github.get('/users/:login', contributor, function (err, user) {
 	        if (err) return nextContributor(err);
