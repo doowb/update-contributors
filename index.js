@@ -2,7 +2,6 @@
 import async from 'async';
 import merge from 'mixin-deep';
 import GitHub from 'github-base';
-import unique from 'array-unique';
 import DataStore from 'data-store';
 import ghUrl from 'parse-github-url';
 import ask from 'ask-for-github-auth';
@@ -86,7 +85,6 @@ export default function(pkg, options, cb) {
     }
   ], (err) => {
     if (err) return cb(err);
-    pkg.contributors = unique(pkg.contributors);
     cb(null, pkg);
   });
 

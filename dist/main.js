@@ -67,23 +67,19 @@ module.exports =
 	
 	var _githubBase2 = _interopRequireDefault(_githubBase);
 	
-	var _arrayUnique = __webpack_require__(5);
-	
-	var _arrayUnique2 = _interopRequireDefault(_arrayUnique);
-	
-	var _dataStore = __webpack_require__(6);
+	var _dataStore = __webpack_require__(5);
 	
 	var _dataStore2 = _interopRequireDefault(_dataStore);
 	
-	var _parseGithubUrl = __webpack_require__(7);
+	var _parseGithubUrl = __webpack_require__(6);
 	
 	var _parseGithubUrl2 = _interopRequireDefault(_parseGithubUrl);
 	
-	var _askForGithubAuth = __webpack_require__(8);
+	var _askForGithubAuth = __webpack_require__(7);
 	
 	var _askForGithubAuth2 = _interopRequireDefault(_askForGithubAuth);
 	
-	var _githubContributors = __webpack_require__(9);
+	var _githubContributors = __webpack_require__(8);
 	
 	var _githubContributors2 = _interopRequireDefault(_githubContributors);
 	
@@ -106,7 +102,7 @@ module.exports =
 	 * @param  {Object} `options` Options to use for github authentication.
 	 * @param {Function} `cb` Callback function that will get an `err` when an error happens or a `results` with the updated package.json object.
 	 * @api public
-	 * @name  `update`
+	 * @name update
 	 */
 	
 	exports['default'] = function (pkg, options, cb) {
@@ -166,7 +162,6 @@ module.exports =
 	    next();
 	  }], function (err) {
 	    if (err) return cb(err);
-	    pkg.contributors = (0, _arrayUnique2['default'])(pkg.contributors);
 	    cb(null, pkg);
 	  });
 	};
@@ -209,28 +204,22 @@ module.exports =
 /* 5 */
 /***/ function(module, exports) {
 
-	module.exports = require("array-unique");
+	module.exports = require("data-store");
 
 /***/ },
 /* 6 */
 /***/ function(module, exports) {
 
-	module.exports = require("data-store");
+	module.exports = require("parse-github-url");
 
 /***/ },
 /* 7 */
 /***/ function(module, exports) {
 
-	module.exports = require("parse-github-url");
-
-/***/ },
-/* 8 */
-/***/ function(module, exports) {
-
 	module.exports = require("ask-for-github-auth");
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports) {
 
 	module.exports = require("github-contributors");
