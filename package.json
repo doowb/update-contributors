@@ -2,15 +2,25 @@
   "name": "update-contributors",
   "description": "Update contributors property in package.json with current github contributors.",
   "version": "0.1.0",
+  "homepage": "https://github.com/doowb/update-contributors",
   "author": "Brian Woodward (https://github.com/doowb)",
+  "repository": "doowb/update-contributors",
+  "bugs": {
+    "url": "https://github.com/doowb/update-contributors/issues"
+  },
   "license": "MIT",
+  "files": [
+    "index.js",
+    "lib/",
+    "dist/"
+  ],
   "main": "dist/main.js",
   "bin": {
     "update-contrib": "./bin/cli.js"
   },
-  "files": [
-    "dist/"
-  ],
+  "engines": {
+    "node": ">=0.10.0"
+  },
   "scripts": {
     "test": "gulp test"
   },
@@ -35,15 +45,5 @@
     "through2": "^2.0.0",
     "webpack": "^1.12.0",
     "should": "*"
-  },
-  "homepage": "https://github.com/doowb/update-contributors",
-  "repository": "doowb/update-contributors",
-  "bugs": {
-    "url": "https://github.com/doowb/update-contributors/issues"
-  },
-  "engines": {
-    "node": ">=0.10.0"
-  },
-  "dependencies": {},
-  "keywords": []
+  }
 }
