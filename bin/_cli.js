@@ -8,8 +8,6 @@ var argv = minimist(process.argv.slice(2));
 var MapConfig = require('map-config');
 var commands = require('./commands');
 var utils = require('./utils');
-var App = require('../');
-var app = new App();
 
 var config = {};
 config.update = utils.omit(argv, '_');
@@ -17,7 +15,7 @@ config.update.args = argv._;
 
 commands.on('error', function (err) {
   console.log(utils.red('Error:'), err.message);
-  process.exit(1);
+  process.exit(0);
 });
 
 commands.on('end', function (cmd) {
@@ -27,5 +25,5 @@ commands.on('end', function (cmd) {
   process.exit(0);
 });
 
-var mapper = new MapConfig(commands, app);
+var mapper = new MapConfig(commands);
 mapper.process(config);

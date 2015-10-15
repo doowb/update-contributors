@@ -1,19 +1,25 @@
 'use strict';
 
 var Emitter = require('component-emitter');
-// var writeFile = require('write');
-// var path = require('path');
-
-// var utils = require('../lib/utils');
+var path = require('path');
+var update = require('../');
+var utils = require('./utils');
 
 var commands = {
-  update: function (config, app) {
-    console.log('updating:');
-    console.log(' * update-contrib');
-    console.log('TODO: fill out these help messages');
-    console.log(config);
-
-    commands.emit('end');
+  update: function (config) {
+    var async = utils.async;
+    var fp = path.join(utils.cwd(process.cwd()), 'package.json');
+    console.log(utils.green('Updating'), utils.gray(fp));
+    async.waterfall([
+      async.apply(update, utils.pkg),
+      function (pkg, next) {
+        utils.writeFile(fp, JSON.stringify(pkg, null, 2), next);
+      }
+    ], function (err) {
+      if (err) return commands.emit('error', err);
+      console.log(utils.green('Saved   '), utils.gray(fp));
+      commands.emit('end');
+    });
   }
 
   // target: function (config, app) {

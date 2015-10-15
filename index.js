@@ -2,7 +2,9 @@
 import async from 'async';
 import merge from 'mixin-deep';
 import GitHub from 'github-base';
+import unique from 'array-unique';
 import DataStore from 'data-store';
+import ghUrl from 'parse-github-url';
 import ask from 'ask-for-github-auth';
 import ghContrib from 'github-contributors';
 
@@ -33,6 +35,13 @@ export default function(pkg, options, cb) {
     cb = options;
     options = {};
   }
+  let repo;
+  if (typeof pkg.repository === 'object') {
+    repo = ghUrl(pkg.repository.url);
+  } else {
+    repo = ghUrl(pkg.repository);
+  }
+  if (!repo) return cb(new Error('Invalid repository property.'));
   async.waterfall([
     // ask for creds
     async.apply(ask, {store}),
@@ -44,7 +53,7 @@ export default function(pkg, options, cb) {
     },
 
     // get contributors
-    async.apply(ghContrib, pkg.repository, options),
+    async.apply(ghContrib, repo.repopath, options),
 
     // get contributor information
     (contributors, next) => {
@@ -62,9 +71,22 @@ export default function(pkg, options, cb) {
           nextContributor();
         });
       }, next);
+    },
+
+    // de-dup
+    (next) => {
+      let contributors = [];
+      pkg.contributors.forEach((contributor) => {
+        if (contributors.filter((existing) => {return existing.name === contributor.name;}).length === 0) {
+          contributors.push(contributor);
+        }
+      });
+      pkg.contributors = contributors;
+      next();
     }
   ], (err) => {
     if (err) return cb(err);
+    pkg.contributors = unique(pkg.contributors);
     cb(null, pkg);
   });
 
