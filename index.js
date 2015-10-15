@@ -24,6 +24,7 @@ const store = new DataStore('update-contributors');
  *
  * @param  {Object} `pkg` Object representing the package.json to update.
  * @param  {Object} `options` Options to use for github authentication.
+ * @param  {Object} `options.creds` Github credentials. May be a token or a username and password. If execuled [ask-for-github-auth][] will be used.
  * @param {Function} `cb` Callback function that will get an `err` when an error happens or a `results` with the updated package.json object.
  * @api public
  * @name update

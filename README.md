@@ -31,7 +31,7 @@ var update = require('update-contributors');
 
 ## API
 
-### [update](index.js#L32)
+### [update](index.js#L33)
 
 Pulldown github contributors and update the `contributors` property in the provided package.json object.
 
@@ -39,6 +39,7 @@ Pulldown github contributors and update the `contributors` property in the provi
 
 * `pkg` **{Object}**: Object representing the package.json to update.
 * `options` **{Object}**: Options to use for github authentication.
+* `options.creds` **{Object}**: Github credentials. May be a token or a username and password. If execuled [ask-for-github-auth](https://github.com/doowb/ask-for-github-auth) will be used.
 * `cb` **{Function}**: Callback function that will get an `err` when an error happens or a `results` with the updated package.json object.
 
 **Example**
