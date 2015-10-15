@@ -68,14 +68,6 @@
     "spawn-commands": "^0.3.1",
     "write": "^0.2.1"
   },
-  "contributors": [
-    {
-      "email": ""
-    },
-    {
-      "email": ""
-    }
-  ],
   "verb": {
     "related": {
       "list": [
@@ -83,5 +75,12 @@
         "github-contributors"
       ]
     }
-  }
+  },
+  "contributors": [
+    {
+      "name": "Brian Woodward",
+      "email": "brian.woodward@gmail.com",
+      "url": "https://github.com/doowb"
+    }
+  ]
 }
