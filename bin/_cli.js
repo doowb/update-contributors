@@ -3,7 +3,7 @@
 'use strict';
 
 var minimist = require('minimist');
-var args = minimist(process.argv.slice(2));
+var argv = minimist(process.argv.slice(2));
 
 var MapConfig = require('map-config');
 var commands = require('./commands');
@@ -11,15 +11,9 @@ var utils = require('./utils');
 var App = require('../');
 var app = new App();
 
-
 var config = {};
-if (args._ && args._.length === 0) {
-  config.help = utils.omit(args, '_');
-} else {
-  var cmd = args._.shift();
-  config[cmd] = utils.omit(args, '_');
-  config[cmd].args = args._;
-}
+config.update = utils.omit(argv, '_');
+config.update.args = argv._;
 
 commands.on('error', function (err) {
   console.log(utils.red('Error:'), err.message);
