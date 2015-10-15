@@ -41,11 +41,11 @@
     "isparta": "^3.1.0",
     "json-loader": "^0.5.2",
     "mocha": "*",
-    "open-eslint-config": "git+ssh://git@github.com/doowb/open-eslint-config.git",
+    "open-eslint-config": "doowb/open-eslint-config",
+    "should": "*",
     "source-map-support": "^0.3.2",
     "through2": "^2.0.0",
-    "webpack": "^1.12.0",
-    "should": "*"
+    "webpack": "^1.12.0"
   },
   "dependencies": {
     "ansi-gray": "^0.1.1",
