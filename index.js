@@ -27,7 +27,7 @@ const store = new DataStore('update-contributors');
  * @param  {Object} `options` Options to use for github authentication.
  * @param {Function} `cb` Callback function that will get an `err` when an error happens or a `results` with the updated package.json object.
  * @api public
- * @name  `update`
+ * @name update
  */
 
 export default function(pkg, options, cb) {

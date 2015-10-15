@@ -75,5 +75,13 @@
     {
       "email": ""
     }
-  ]
+  ],
+  "verb": {
+    "related": {
+      "list": [
+        "github-base",
+        "github-contributors"
+      ]
+    }
+  }
 }
