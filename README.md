@@ -31,7 +31,7 @@ var update = require('update-contributors');
 
 ## API
 
-### [update](index.js#L33)
+### [update](index.js#L32)
 
 Pulldown github contributors and update the `contributors` property in the provided package.json object.
 
