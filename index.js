@@ -43,7 +43,14 @@ export default function(pkg, options, cb) {
   if (!repo) return cb(new Error('Invalid repository property.'));
   async.waterfall([
     // ask for creds
-    async.apply(ask, {store}),
+    (next) => {
+      if (options.creds) {
+        let creds = options.creds;
+        delete options.creds;
+        return next(null, creds);
+      }
+      ask({store}, next);
+    },
 
     // update creds on options
     (creds, next) => {
@@ -57,8 +64,7 @@ export default function(pkg, options, cb) {
     // get contributor information
     (contributors, next) => {
       const github = new GitHub(options);
-      pkg.contributors = pkg.contributors || [];
-      pkg.contributors = Array.isArray(pkg.contributors) ? pkg.contributors : pkg.contributors;
+      pkg.contributors = [];
       async.eachSeries(contributors, (contributor, nextContributor) => {
         github.get('/users/:login', contributor, (err, user) => {
           if (err) return nextContributor(err);

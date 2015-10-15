@@ -8,7 +8,16 @@ describe('update-contributors', function() {
 
   it('should get contributors', function(done) {
     let pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/composer-package.json')));
-    update(pkg, (err, results) => {
+    let options = {};
+    // or travis-ci
+    if (process.env.CI) {
+      options.creds = {
+        username: 'fake',
+        password: 'password'
+      };
+    }
+
+    update(pkg, options, (err, results) => {
       if (err) return done(err);
       assert(results);
       assert(Array.isArray(results.contributors));
