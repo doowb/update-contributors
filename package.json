@@ -45,5 +45,17 @@
     "through2": "^2.0.0",
     "webpack": "^1.12.0",
     "should": "*"
+  },
+  "dependencies": {
+    "ansi-gray": "^0.1.1",
+    "ansi-green": "^0.1.1",
+    "ansi-red": "^0.1.1",
+    "component-emitter": "^1.2.0",
+    "has-generators": "^1.0.1",
+    "lazy-cache": "^0.2.3",
+    "map-config": "^0.1.1",
+    "minimist": "^1.2.0",
+    "object.omit": "^2.0.0",
+    "spawn-commands": "^0.3.1"
   }
 }
