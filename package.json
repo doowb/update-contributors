@@ -1,10 +1,13 @@
 {
-  "name": "boilerplate-module",
-  "description": "Boilerplate to create node modules with all the latest bells and whistles.",
+  "name": "update-contributors",
+  "description": "Update contributors property in package.json with current github contributors.",
   "version": "0.1.0",
   "author": "Brian Woodward (https://github.com/doowb)",
   "license": "MIT",
   "main": "dist/main.js",
+  "bin": {
+    "update-contrib": "./bin/cli.js"
+  },
   "files": [
     "dist/"
   ],
@@ -20,7 +23,6 @@
     "babel-runtime": "^5.8.24",
     "eslint": "^1.4.3",
     "eslint-friendly-formatter": "^1.1.0",
-    "eslint-plugin-react": "^3.5.1",
     "gulp": "^3.9.0",
     "gulp-eslint": "^1.0.0",
     "gulp-istanbul": "^0.10.1",
@@ -34,10 +36,10 @@
     "webpack": "^1.12.0",
     "should": "*"
   },
-  "homepage": "https://github.com/doowb/boilerplate-module",
-  "repository": "doowb/boilerplate-module",
+  "homepage": "https://github.com/doowb/update-contributors",
+  "repository": "doowb/update-contributors",
   "bugs": {
-    "url": "https://github.com/doowb/boilerplate-module/issues"
+    "url": "https://github.com/doowb/update-contributors/issues"
   },
   "engines": {
     "node": ">=0.10.0"

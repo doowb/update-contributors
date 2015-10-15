@@ -34,9 +34,9 @@ gulp.task('test', ['coverage'], () => {
 });
 
 gulp.task('lint', () => {
-  let {rules} = eslintConfig({isDev: true, lintEnv: 'build', react: false});
+  let config = eslintConfig({isDev: true, lintEnv: 'build', react: false});
   return gulp.src(lint.concat(['test/*.js']))
-    .pipe(eslint({rules, configFile: './eslint-config.json'}))
+    .pipe(eslint(config))
     .pipe(eslint.format(formatter));
 });
 
