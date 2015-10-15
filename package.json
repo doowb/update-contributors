@@ -12,7 +12,6 @@
   "files": [
     "index.js",
     "bin/",
-    "lib/",
     "dist/"
   ],
   "main": "dist/main.js",

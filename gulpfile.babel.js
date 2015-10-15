@@ -9,7 +9,7 @@ import webpackConfig from './webpack.config';
 import eslintConfig from 'open-eslint-config';
 import formatter from 'eslint-friendly-formatter';
 
-const lint = ['index.js', 'gulpfile.babel.js', 'lib/**/*.js'];
+const lint = ['index.js', 'gulpfile.babel.js'];
 
 gulp.task('coverage', ['lint'], () => {
   return gulp.src(lint.concat(['!gulpfile.babel.js']))
