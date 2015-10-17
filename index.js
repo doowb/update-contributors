@@ -5,7 +5,7 @@ import GitHub from 'github-base';
 import DataStore from 'data-store';
 import ghUrl from 'parse-github-url';
 import ask from 'ask-for-github-auth';
-import ghContrib from 'github-contributors';
+// import ghContrib from 'github-contributors';
 
 const store = new DataStore('update-contributors');
 
@@ -42,6 +42,7 @@ export default function(pkg, options, cb) {
     repo = ghUrl(pkg.repository);
   }
   if (!repo) return cb(new Error('Invalid repository property.'));
+
   async.waterfall([
     // ask for creds
     (next) => {
@@ -60,10 +61,20 @@ export default function(pkg, options, cb) {
     },
 
     // get contributors
-    async.apply(ghContrib, repo.repopath, options),
+    (next) => {
+      const github = new GitHub(options);
+      github.get('/repos/:repopath/contributors', repo, (err, contributors) => {
+        if (err) return next(err);
+        next(null, contributors);
+      });
+    },
+    // async.apply(ghContrib, repo.repopath, options),
 
     // get contributor information
     (contributors, next) => {
+      if (!Array.isArray(contributors)) {
+        return next(new Error(contributors.message));
+      }
       const github = new GitHub(options);
       pkg.contributors = [];
       async.eachSeries(contributors, (contributor, nextContributor) => {
@@ -94,6 +105,5 @@ export default function(pkg, options, cb) {
     if (err) return cb(err);
     cb(null, pkg);
   });
-
 
 }

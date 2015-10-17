@@ -22,7 +22,8 @@
     "node": ">=0.10.0"
   },
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp test",
+    "bundle": "browserify index.js -t babelify --node --standalone update-contributors -o ./dist/bundle.js"
   },
   "devDependencies": {
     "babel": "^5.8.23",
@@ -31,6 +32,8 @@
     "babel-loader": "^5.3.2",
     "babel-plugin-rewire": "^0.1.13",
     "babel-runtime": "^5.8.24",
+    "babelify": "^6.3.0",
+    "browserify": "^11.2.0",
     "eslint": "^1.4.3",
     "eslint-friendly-formatter": "^1.1.0",
     "gulp": "^3.9.0",
