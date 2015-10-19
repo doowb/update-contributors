@@ -3,22 +3,24 @@ import path from 'path';
 import assert from 'assert';
 import update from '../index';
 
+let upd;
+
 describe('update-contributors', function() {
   this.timeout(0);
+  beforeEach(function() {
+    upd = function(done) {
+      return function() {
+        if (process.env.CI) {
+          return done();
+        }
+        update.apply(update, arguments);
+      };
+    };
+  });
 
   it('should get contributors', function(done) {
     let pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/composer-package.json')));
-    let options = {};
-
-    // on travis-ci
-    if (process.env.CI) {
-      options.creds = {
-        username: 'fake',
-        password: 'password'
-      };
-    }
-
-    update(pkg, options, (err, results) => {
+    upd(done)(pkg, (err, results) => {
       if (err) return done(err);
       assert(results);
       assert(Array.isArray(results.contributors));
@@ -35,7 +37,7 @@ describe('update-contributors', function() {
       password: 'password'
     };
 
-    update(pkg, options, function(err, results) {
+    upd(done)(pkg, options, function(err, results) {
       if (err) {
         assert.equal(err.message, 'Bad credentials');
         return done();
@@ -47,7 +49,7 @@ describe('update-contributors', function() {
   it('should return an error when repo does not exist', function(done) {
     let pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/composer-package.json')));
     pkg.repository = {url: 'doowb/this-repo-show-not-exist'};
-    update(pkg, function(err, results) {
+    upd(done)(pkg, function(err, results) {
       if (err) {
         assert.equal(err.message, 'Not Found');
         return done();
@@ -59,7 +61,7 @@ describe('update-contributors', function() {
   it('should return an error repository property is invalid', function(done) {
     let pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/composer-package.json')));
     pkg.repository = {url: ''};
-    update(pkg, function(err, results) {
+    upd(done)(pkg, function(err, results) {
       if (err) {
         assert.equal(err.message, 'Invalid repository property.');
         return done();
