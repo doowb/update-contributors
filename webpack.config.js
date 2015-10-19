@@ -40,13 +40,10 @@ module.exports =  {
     libraryTarget: 'commonjs2'
   },
   module: {
-    loaders: loaders,
-    // Disable handling of unknown requires
-    unknownContextRegExp: /$^/,
-    unknownContextCritical: false
+    loaders: loaders
   },
   plugins: plugins,
   target: 'node',
-  devtool: 'sourcemap'
-  // externals: nodeModules
+  devtool: 'sourcemap',
+  externals: nodeModules
 };
