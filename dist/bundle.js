@@ -31,7 +31,9 @@ var _askForGithubAuth = require('ask-for-github-auth');
 
 var _askForGithubAuth2 = _interopRequireDefault(_askForGithubAuth);
 
-// import ghContrib from 'github-contributors';
+var _githubContributors = require('github-contributors');
+
+var _githubContributors2 = _interopRequireDefault(_githubContributors);
 
 var store = new _dataStore2['default']('update-contributors');
 
@@ -87,14 +89,7 @@ exports['default'] = function (pkg, options, cb) {
   },
 
   // get contributors
-  function (next) {
-    var github = new _githubBase2['default'](options);
-    github.get('/repos/:repopath/contributors', repo, function (err, contributors) {
-      if (err) return next(err);
-      next(null, contributors);
-    });
-  },
-  // async.apply(ghContrib, repo.repopath, options),
+  _async2['default'].apply(_githubContributors2['default'], repo.repopath, options),
 
   // get contributor information
   function (contributors, next) {
@@ -106,6 +101,9 @@ exports['default'] = function (pkg, options, cb) {
     _async2['default'].eachSeries(contributors, function (contributor, nextContributor) {
       github.get('/users/:login', contributor, function (err, user) {
         if (err) return nextContributor(err);
+        if (user && user.message && user.message === 'Bad credentials') {
+          return nextContributor(new Error(user.message));
+        }
         pkg.contributors.push({
           name: user.name || user.login,
           email: user.email || '',
@@ -114,20 +112,6 @@ exports['default'] = function (pkg, options, cb) {
         nextContributor();
       });
     }, next);
-  },
-
-  // de-dup
-  function (next) {
-    var contributors = [];
-    pkg.contributors.forEach(function (contributor) {
-      if (contributors.filter(function (existing) {
-        return existing.name === contributor.name;
-      }).length === 0) {
-        contributors.push(contributor);
-      }
-    });
-    pkg.contributors = contributors;
-    next();
   }], function (err) {
     if (err) return cb(err);
     cb(null, pkg);
@@ -136,7 +120,7 @@ exports['default'] = function (pkg, options, cb) {
 
 module.exports = exports['default'];
 
-},{"ask-for-github-auth":2,"async":80,"data-store":82,"github-base":155,"mixin-deep":210,"parse-github-url":217}],2:[function(require,module,exports){
+},{"ask-for-github-auth":2,"async":80,"data-store":82,"github-base":155,"github-contributors":209,"mixin-deep":285,"parse-github-url":292}],2:[function(require,module,exports){
 /*!
  * ask-for-github-auth <https://github.com/doowb/ask-for-github-auth>
  *
@@ -563,7 +547,7 @@ require = fn;
 
 module.exports = utils;
 
-},{"data-store":82,"get-value":4,"isobject":7,"lazy-cache":209,"mixin-deep":210}],10:[function(require,module,exports){
+},{"data-store":82,"get-value":4,"isobject":7,"lazy-cache":284,"mixin-deep":285}],10:[function(require,module,exports){
 /*!
  * git-username <https://github.com/jonschlinkert/git-username>
  *
@@ -23620,7 +23604,7 @@ require = fn;
 
 module.exports = utils;
 
-},{"get-value":69,"has-value":72,"inquirer":22,"kind-of":74,"lazy-cache":209,"mixin-deep":210,"set-value":76}],80:[function(require,module,exports){
+},{"get-value":69,"has-value":72,"inquirer":22,"kind-of":74,"lazy-cache":284,"mixin-deep":285,"set-value":76}],80:[function(require,module,exports){
 /*!
  * async
  * https://github.com/caolan/async
@@ -25971,7 +25955,7 @@ require = fn;
 
 module.exports = utils;
 
-},{"define-property":96,"isobject":85,"lazy-cache":209}],88:[function(require,module,exports){
+},{"define-property":96,"isobject":85,"lazy-cache":284}],88:[function(require,module,exports){
 /*!
  * collection-visit <https://github.com/jonschlinkert/collection-visit>
  *
@@ -26081,7 +26065,7 @@ require('object-visit', 'visit');
 
 module.exports = utils;
 
-},{"lazy-cache":209,"object-visit":90}],93:[function(require,module,exports){
+},{"lazy-cache":284,"object-visit":90}],93:[function(require,module,exports){
 /*!
  * object-visit <https://github.com/jonschlinkert/object-visit>
  *
@@ -26129,7 +26113,7 @@ require('object-visit', 'visit');
 
 module.exports = utils;
 
-},{"lazy-cache":209,"map-visit":89,"object-visit":93}],96:[function(require,module,exports){
+},{"lazy-cache":284,"map-visit":89,"object-visit":93}],96:[function(require,module,exports){
 /*!
  * define-property <https://github.com/jonschlinkert/define-property>
  *
@@ -26401,7 +26385,7 @@ require = fn;
 
 module.exports = utils;
 
-},{"arr-diff":99,"kind-of":129,"lazy-cache":209}],103:[function(require,module,exports){
+},{"arr-diff":99,"kind-of":129,"lazy-cache":284}],103:[function(require,module,exports){
 /*!
  * is-data-descriptor <https://github.com/jonschlinkert/is-data-descriptor>
  *
@@ -26467,7 +26451,7 @@ arguments[4][100][0].apply(exports,arguments)
 arguments[4][101][0].apply(exports,arguments)
 },{"dup":101}],107:[function(require,module,exports){
 arguments[4][102][0].apply(exports,arguments)
-},{"arr-diff":104,"dup":102,"kind-of":129,"lazy-cache":209}],108:[function(require,module,exports){
+},{"arr-diff":104,"dup":102,"kind-of":129,"lazy-cache":284}],108:[function(require,module,exports){
 'use strict';
 
 /**
@@ -26494,7 +26478,7 @@ require = fn;
 
 module.exports = utils;
 
-},{"is-accessor-descriptor":98,"is-data-descriptor":103,"kind-of":129,"lazy-cache":209}],109:[function(require,module,exports){
+},{"is-accessor-descriptor":98,"is-data-descriptor":103,"kind-of":129,"lazy-cache":284}],109:[function(require,module,exports){
 arguments[4][4][0].apply(exports,arguments)
 },{"dup":4,"is-extendable":110,"noncharacters":111}],110:[function(require,module,exports){
 arguments[4][5][0].apply(exports,arguments)
@@ -26563,7 +26547,7 @@ require = fn;
 
 module.exports = utils;
 
-},{"class-utils":84,"collection-visit":88,"component-emitter":81,"define-property":96,"get-value":109,"lazy-cache":209,"set-value":112,"unset-value":115}],119:[function(require,module,exports){
+},{"class-utils":84,"collection-visit":88,"component-emitter":81,"define-property":96,"get-value":109,"lazy-cache":284,"set-value":112,"unset-value":115}],119:[function(require,module,exports){
 'use strict'
 
 var fs = require('fs')
@@ -30519,7 +30503,7 @@ utils.arrayify = function (val) {
 
 module.exports = utils;
 
-},{"graceful-fs":120,"has-own-deep":123,"has-value":124,"kind-of":129,"lazy-cache":209,"mkdirp":131,"rimraf":145,"union-value":146}],155:[function(require,module,exports){
+},{"graceful-fs":120,"has-own-deep":123,"has-value":124,"kind-of":129,"lazy-cache":284,"mkdirp":131,"rimraf":145,"union-value":146}],155:[function(require,module,exports){
 'use strict';
 
 var util = require('util');
@@ -30909,7 +30893,7 @@ function toBase64(str) {
   return new Buffer(str).toString('base64');
 }
 
-},{"extend-shallow":200,"mixin-deep":210,"object.omit":213,"parse-link-header":202,"simple-get":204}],157:[function(require,module,exports){
+},{"extend-shallow":200,"mixin-deep":285,"object.omit":288,"parse-link-header":202,"simple-get":204}],157:[function(require,module,exports){
 var Writable = require('readable-stream').Writable
 var inherits = require('inherits')
 
@@ -34126,7 +34110,7 @@ require('kind-of', 'typeOf');
 require = fn;
 module.exports = utils;
 
-},{"is-extendable":180,"kind-of":177,"lazy-cache":209,"mixin-object":181}],184:[function(require,module,exports){
+},{"is-extendable":180,"kind-of":177,"lazy-cache":284,"mixin-object":181}],184:[function(require,module,exports){
 'use strict';
 
 /**
@@ -34149,7 +34133,7 @@ require = fn;
 
 module.exports = utils;
 
-},{"for-own":173,"is-plain-object":175,"kind-of":177,"lazy-cache":209,"shallow-clone":179}],185:[function(require,module,exports){
+},{"for-own":173,"is-plain-object":175,"kind-of":177,"lazy-cache":284,"shallow-clone":179}],185:[function(require,module,exports){
 arguments[4][96][0].apply(exports,arguments)
 },{"dup":96,"is-descriptor":186}],186:[function(require,module,exports){
 arguments[4][97][0].apply(exports,arguments)
@@ -34163,7 +34147,7 @@ arguments[4][100][0].apply(exports,arguments)
 arguments[4][101][0].apply(exports,arguments)
 },{"dup":101}],191:[function(require,module,exports){
 arguments[4][102][0].apply(exports,arguments)
-},{"arr-diff":188,"dup":102,"kind-of":197,"lazy-cache":209}],192:[function(require,module,exports){
+},{"arr-diff":188,"dup":102,"kind-of":197,"lazy-cache":284}],192:[function(require,module,exports){
 arguments[4][103][0].apply(exports,arguments)
 },{"./utils":196,"dup":103}],193:[function(require,module,exports){
 arguments[4][99][0].apply(exports,arguments)
@@ -34173,13 +34157,13 @@ arguments[4][100][0].apply(exports,arguments)
 arguments[4][101][0].apply(exports,arguments)
 },{"dup":101}],196:[function(require,module,exports){
 arguments[4][102][0].apply(exports,arguments)
-},{"arr-diff":193,"dup":102,"kind-of":197,"lazy-cache":209}],197:[function(require,module,exports){
+},{"arr-diff":193,"dup":102,"kind-of":197,"lazy-cache":284}],197:[function(require,module,exports){
 arguments[4][74][0].apply(exports,arguments)
 },{"dup":74,"is-buffer":198}],198:[function(require,module,exports){
 arguments[4][75][0].apply(exports,arguments)
 },{"dup":75}],199:[function(require,module,exports){
 arguments[4][108][0].apply(exports,arguments)
-},{"dup":108,"is-accessor-descriptor":187,"is-data-descriptor":192,"kind-of":197,"lazy-cache":209}],200:[function(require,module,exports){
+},{"dup":108,"is-accessor-descriptor":187,"is-data-descriptor":192,"kind-of":197,"lazy-cache":284}],200:[function(require,module,exports){
 'use strict';
 
 var isObject = require('is-extendable');
@@ -34406,6 +34390,1884 @@ module.exports = function (res) {
 },{"zlib":undefined}],208:[function(require,module,exports){
 arguments[4][203][0].apply(exports,arguments)
 },{"dup":203}],209:[function(require,module,exports){
+'use strict';
+
+var pad = require('right-pad-values');
+var mdu = require('markdown-utils');
+var GitHub = require('github-base');
+var format = {};
+
+module.exports = function contributors(repo, options, cb) {
+  if (typeof repo !== 'string') {
+    throw new TypeError('github-contributors expects repo to be a string.');
+  }
+
+  if (typeof options === 'function') {
+    cb = options; options = {};
+  }
+
+  if (typeof cb !== 'function') {
+    throw new TypeError('github-contributors expects callback to be a function.');
+  }
+
+  options = options || {};
+  var url = '/repos/:repo/contributors';
+  var github = new GitHub(options);
+  github.getAll(url, {repo: repo}, function (err, res) {
+    if (err) return cb(err);
+    if (options.format) {
+      if (!format.hasOwnProperty(options.format)) {
+        cb(new Error('github-contributors does not have format: ' + options.format));
+      }
+      return cb(null, format[options.format](res));
+    }
+    cb(null, res);
+  });
+};
+
+format.table = function table(arr) {
+  arr = pad(arr, 'contributions');
+  var res = '| **Commits** | **Contributor**<br/> |';
+  res += '\n';
+  res += '| --- | --- |';
+  res += '\n';
+
+  arr.forEach(function (person) {
+    res += '| ';
+    res += person.contributions;
+    res += ' | ';
+    res += mdu.link(person.login, person.html_url);
+    res += ' |';
+    res += '\n';
+  });
+  return res;
+};
+
+format.list = function list(arr) {
+  arr = pad(arr, 'contributions');
+  var res = '**Commits** / **Contributor**\n';
+
+  arr.forEach(function (person) {
+    res += '+ ';
+    res += person.contributions;
+    res += ' ';
+    res += mdu.link(person.login, person.html_url);
+    res += '\n';
+  });
+  return res;
+};
+
+format.aligned = function aligned(arr) {
+  arr = pad(arr, 'contributions');
+  var res = '```bash\n';
+  res += 'COMMITS / CONTRIBUTOR\n';
+  res += '------- | -----------\n';
+
+  arr.forEach(function (person) {
+    res += person.contributions;
+    res += '      ';
+    res += person.login;
+    res += '\n';
+  });
+
+  res += '```\n';
+  return res;
+};
+
+},{"github-base":210,"markdown-utils":264,"right-pad-values":279}],210:[function(require,module,exports){
+arguments[4][155][0].apply(exports,arguments)
+},{"./lib/utils":211,"concat-stream":212,"delegate-properties":226,"dup":155,"extend-shallow":255,"simple-get":259,"util":undefined}],211:[function(require,module,exports){
+'use strict';
+
+var parseLink = require('parse-link-header');
+var request = require('simple-get');
+var extend = require('extend-shallow');
+var mixin = require('mixin-deep');
+var omit = require('object.omit');
+
+/**
+ * expose `utils`
+ */
+
+var utils = module.exports;
+
+/**
+ * Recursive walk over paged content
+ */
+
+utils.requestAll = function (opts, callback) {
+  opts.url = /\?/.test(opts.url) ? opts.url : opts.url + '?per_page=100';
+
+  request.concat(opts, function (err, data, res) {
+    if (err) {return callback(err);}
+    data = JSON.parse(data.toString());
+
+    var links = parseLink(res.headers.link);
+    if (links && links.next) {
+      opts.url = links.next.url;
+      return utils.requestAll(opts, function (err, res, response) {
+        if (err) {return callback(err);}
+        res = JSON.parse(res.toString());
+        callback(null, data.concat(res), response);
+      });
+    }
+    callback(null, data, res);
+  });
+};
+
+/**
+ * Default settings to use for GitHub API requests.
+ *
+ * @param  {Object} `options`
+ * @return {Object}
+ */
+
+utils.defaults = function (options) {
+  return function (method, path, data) {
+    var opts = mixin({}, options);
+    var config = lowercase(opts);
+    opts = mixin({}, config, data);
+    opts = interpolate(path, opts);
+    opts = createURL(opts);
+    opts = lowercase(opts);
+    opts = createAuth(opts);
+    opts = cleanup(opts);
+    opts.method = opts.method || method || 'get';
+    opts = normalize(opts, config);
+
+    opts.headers = extend({
+      accept: 'application/json',
+      'user-agent': 'https://github.com/jonschlinkert/github-base'
+    }, lowercase(opts.headers));
+
+    return opts;
+  };
+};
+
+/**
+ * Replace placeholders with actual values.
+ */
+
+function interpolate(path, opts) {
+  var placeholders = [];
+  opts = opts || {};
+
+  opts.url = path.replace(/:(\w+)/g, function(m, prop) {
+    placeholders.push(prop);
+    return opts[prop] || prop;
+  });
+  opts.placeholders = placeholders;
+
+  return opts;
+}
+
+/**
+ * Create url to request and prevent cache
+ */
+
+function createURL(opts) {
+  opts.url += (/\?/.test(opts.url) ? '&' : '?');
+  opts.url += (new Date()).getTime();
+  opts.url = opts.apiurl + opts.url;
+  return opts;
+}
+
+/**
+ * Lowercase the keys in the given object.
+ */
+
+function lowercase(obj) {
+  var res = {};
+  for (var key in obj) {
+    res[key.toLowerCase()] = obj[key];
+  }
+  return res;
+}
+
+/**
+ * Create auth string - token or Basic Auth
+ */
+
+function createAuth(opts) {
+  if (!(opts.token || (opts.username && opts.password))) {
+    return opts;
+  }
+
+  opts.headers = opts.headers || {};
+  if (opts.token) {
+    opts.headers['authorization'] = 'token ' + opts.token;
+    return opts;
+  }
+
+  var creds = opts.username + ':' + opts.password;
+  opts.headers['authorization'] = 'Basic ' + toBase64(creds);
+
+  return opts;
+}
+
+/**
+ * Cleanup request options object
+ */
+
+function cleanup(opts) {
+  var keys = [
+    'apiurl', 'token', 'username', 'password', 'placeholders'
+  ];
+  opts.placeholders = opts.placeholders.concat(keys);
+  opts = omit(opts, opts.placeholders);
+
+  return opts;
+}
+
+/**
+ * Normalize request options object,
+ * the request body and few body-related headers
+ */
+
+function normalize(opts, config) {
+  var body = omit(opts, Object.keys(config).concat([
+    'headers', 'method', 'url'
+  ]));
+  var bodyKeys = Object.keys(body);
+  var isBody = bodyKeys.length !== 0;
+
+  if (isBody) {
+    opts = omit(opts, bodyKeys);
+    opts.body = JSON.stringify(body);
+    opts.headers['content-length'] = opts.body.length;
+  }
+  if (isBody && !opts.headers['content-type']) {
+    opts.headers['content-type'] = 'application/json';
+  }
+  if (!isBody && opts.method.toLowerCase() === 'put') {
+    opts.headers['content-length'] = 0;
+  }
+  return opts;
+}
+
+/**
+ * Convert a string to base64
+ */
+
+function toBase64(str) {
+  return new Buffer(str).toString('base64');
+}
+
+},{"extend-shallow":255,"mixin-deep":285,"object.omit":288,"parse-link-header":257,"simple-get":259}],212:[function(require,module,exports){
+arguments[4][157][0].apply(exports,arguments)
+},{"dup":157,"inherits":213,"readable-stream":224,"typedarray":225}],213:[function(require,module,exports){
+arguments[4][136][0].apply(exports,arguments)
+},{"dup":136,"util":undefined}],214:[function(require,module,exports){
+arguments[4][159][0].apply(exports,arguments)
+},{"./_stream_readable":216,"./_stream_writable":218,"core-util-is":219,"dup":159,"inherits":213,"process-nextick-args":221}],215:[function(require,module,exports){
+arguments[4][160][0].apply(exports,arguments)
+},{"./_stream_transform":217,"core-util-is":219,"dup":160,"inherits":213}],216:[function(require,module,exports){
+arguments[4][161][0].apply(exports,arguments)
+},{"./_stream_duplex":214,"buffer":undefined,"core-util-is":219,"dup":161,"events":undefined,"inherits":213,"isarray":220,"process-nextick-args":221,"string_decoder/":222,"util":undefined}],217:[function(require,module,exports){
+arguments[4][162][0].apply(exports,arguments)
+},{"./_stream_duplex":214,"core-util-is":219,"dup":162,"inherits":213}],218:[function(require,module,exports){
+arguments[4][163][0].apply(exports,arguments)
+},{"./_stream_duplex":214,"buffer":undefined,"core-util-is":219,"dup":163,"events":undefined,"inherits":213,"process-nextick-args":221,"util-deprecate":223}],219:[function(require,module,exports){
+arguments[4][164][0].apply(exports,arguments)
+},{"dup":164}],220:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"dup":8}],221:[function(require,module,exports){
+arguments[4][166][0].apply(exports,arguments)
+},{"dup":166}],222:[function(require,module,exports){
+arguments[4][167][0].apply(exports,arguments)
+},{"buffer":undefined,"dup":167}],223:[function(require,module,exports){
+arguments[4][168][0].apply(exports,arguments)
+},{"dup":168,"util":undefined}],224:[function(require,module,exports){
+arguments[4][169][0].apply(exports,arguments)
+},{"./lib/_stream_duplex.js":214,"./lib/_stream_passthrough.js":215,"./lib/_stream_readable.js":216,"./lib/_stream_transform.js":217,"./lib/_stream_writable.js":218,"dup":169}],225:[function(require,module,exports){
+arguments[4][170][0].apply(exports,arguments)
+},{"dup":170}],226:[function(require,module,exports){
+arguments[4][171][0].apply(exports,arguments)
+},{"clone-deep":227,"define-property":240,"dup":171}],227:[function(require,module,exports){
+arguments[4][172][0].apply(exports,arguments)
+},{"./utils":239,"dup":172}],228:[function(require,module,exports){
+arguments[4][173][0].apply(exports,arguments)
+},{"dup":173,"for-in":229}],229:[function(require,module,exports){
+arguments[4][174][0].apply(exports,arguments)
+},{"dup":174}],230:[function(require,module,exports){
+arguments[4][175][0].apply(exports,arguments)
+},{"dup":175,"isobject":231}],231:[function(require,module,exports){
+arguments[4][77][0].apply(exports,arguments)
+},{"dup":77}],232:[function(require,module,exports){
+arguments[4][74][0].apply(exports,arguments)
+},{"dup":74,"is-buffer":233}],233:[function(require,module,exports){
+arguments[4][75][0].apply(exports,arguments)
+},{"dup":75}],234:[function(require,module,exports){
+arguments[4][179][0].apply(exports,arguments)
+},{"./utils":238,"dup":179}],235:[function(require,module,exports){
+arguments[4][5][0].apply(exports,arguments)
+},{"dup":5}],236:[function(require,module,exports){
+arguments[4][181][0].apply(exports,arguments)
+},{"dup":181,"for-in":237,"is-extendable":235}],237:[function(require,module,exports){
+arguments[4][174][0].apply(exports,arguments)
+},{"dup":174}],238:[function(require,module,exports){
+arguments[4][183][0].apply(exports,arguments)
+},{"dup":183,"is-extendable":235,"kind-of":232,"lazy-cache":284,"mixin-object":236}],239:[function(require,module,exports){
+arguments[4][184][0].apply(exports,arguments)
+},{"dup":184,"for-own":228,"is-plain-object":230,"kind-of":232,"lazy-cache":284,"shallow-clone":234}],240:[function(require,module,exports){
+arguments[4][96][0].apply(exports,arguments)
+},{"dup":96,"is-descriptor":241}],241:[function(require,module,exports){
+arguments[4][97][0].apply(exports,arguments)
+},{"./utils":254,"dup":97}],242:[function(require,module,exports){
+arguments[4][98][0].apply(exports,arguments)
+},{"./utils":246,"dup":98}],243:[function(require,module,exports){
+arguments[4][99][0].apply(exports,arguments)
+},{"arr-flatten":244,"array-slice":245,"dup":99}],244:[function(require,module,exports){
+arguments[4][100][0].apply(exports,arguments)
+},{"dup":100}],245:[function(require,module,exports){
+arguments[4][101][0].apply(exports,arguments)
+},{"dup":101}],246:[function(require,module,exports){
+arguments[4][102][0].apply(exports,arguments)
+},{"arr-diff":243,"dup":102,"kind-of":252,"lazy-cache":284}],247:[function(require,module,exports){
+arguments[4][103][0].apply(exports,arguments)
+},{"./utils":251,"dup":103}],248:[function(require,module,exports){
+arguments[4][99][0].apply(exports,arguments)
+},{"arr-flatten":249,"array-slice":250,"dup":99}],249:[function(require,module,exports){
+arguments[4][100][0].apply(exports,arguments)
+},{"dup":100}],250:[function(require,module,exports){
+arguments[4][101][0].apply(exports,arguments)
+},{"dup":101}],251:[function(require,module,exports){
+arguments[4][102][0].apply(exports,arguments)
+},{"arr-diff":248,"dup":102,"kind-of":252,"lazy-cache":284}],252:[function(require,module,exports){
+arguments[4][74][0].apply(exports,arguments)
+},{"dup":74,"is-buffer":253}],253:[function(require,module,exports){
+arguments[4][75][0].apply(exports,arguments)
+},{"dup":75}],254:[function(require,module,exports){
+arguments[4][108][0].apply(exports,arguments)
+},{"dup":108,"is-accessor-descriptor":242,"is-data-descriptor":247,"kind-of":252,"lazy-cache":284}],255:[function(require,module,exports){
+arguments[4][200][0].apply(exports,arguments)
+},{"dup":200,"is-extendable":256}],256:[function(require,module,exports){
+arguments[4][5][0].apply(exports,arguments)
+},{"dup":5}],257:[function(require,module,exports){
+arguments[4][202][0].apply(exports,arguments)
+},{"dup":202,"querystring":undefined,"url":undefined,"xtend":258}],258:[function(require,module,exports){
+arguments[4][203][0].apply(exports,arguments)
+},{"dup":203}],259:[function(require,module,exports){
+arguments[4][204][0].apply(exports,arguments)
+},{"dup":204,"http":undefined,"https":undefined,"once":261,"unzip-response":262,"url":undefined,"xtend":263}],260:[function(require,module,exports){
+arguments[4][63][0].apply(exports,arguments)
+},{"dup":63}],261:[function(require,module,exports){
+arguments[4][64][0].apply(exports,arguments)
+},{"dup":64,"wrappy":260}],262:[function(require,module,exports){
+arguments[4][207][0].apply(exports,arguments)
+},{"dup":207,"zlib":undefined}],263:[function(require,module,exports){
+arguments[4][203][0].apply(exports,arguments)
+},{"dup":203}],264:[function(require,module,exports){
+/*!
+ * markdown-utils <https://github.com/jonschlinkert/markdown-utils>
+ *
+ * Copyright (c) 2014 Jon Schlinkert, contributors.
+ * Licensed under the MIT license.
+ */
+
+'use strict';
+
+var isNumber = require('is-number');
+var slice = require('array-slice');
+var listitem = require('list-item');
+var codeBlock = require('to-gfm-code-block');
+
+/**
+ * Create a markdown-formatted anchor link from the given values.
+ *
+ * ```js
+ * utils.anchor('embed', 'assemble/handlebars-helpers/lib/code.js', 25, 'v0.6.0');
+ * //=> [embed](https://github.com/assemble/handlebars-helpers/blob/v0.6.0/lib/helpers/code.js#L25)
+ * ```
+ *
+ * @name anchor
+ * @param  {String} `anchor`
+ * @param  {String} `href`
+ * @param  {String} `title`
+ * @api public
+ */
+
+exports.anchor = function anchor(text, repo, line, branch) {
+  return '[' + text + '](' + format(repo, branch, line) + ')';
+};
+
+function format(str, branch, line) {
+  var segs = str.split(/[\\\/]/);
+  var repo = slice(segs, 0, 2).join('/');
+  var rest = slice(segs, 2).join('/');
+  if (isNumber(branch)) {
+    line = branch;
+    branch = 'master';
+  }
+  var res = 'https://github.com/';
+  res += (repo + '/blob/' + branch + '/' + rest);
+  res += (line ? '#L' + line : '');
+  return res;
+}
+
+/**
+ * Create a markdown-formatted badge.
+ *
+ * ```js
+ * utils.badge(alt, img_url, url);
+ * //=> [![Build Status](https://travis-ci.org/jonschlinkert/template.svg)](https://travis-ci.org/jonschlinkert/template)
+ * ```
+ *
+ * @name badge
+ * @param  {String} `alt`
+ * @param  {String} `img_url`
+ * @param  {String} `url`
+ * @api public
+ */
+
+exports.badge = function badge(alt, img_url, url) {
+  return exports.link(exports.image(alt, img_url), url);
+};
+
+/**
+ * Create a markdown-formatted blockquote.
+ *
+ * ```js
+ * utils.blockquote('This is a blockquote');
+ * //=> '> This is a blockquote'
+ * ```
+ *
+ * @name blockquote
+ * @param  {String} `str`
+ * @api public
+ */
+
+exports.blockquote = function blockquote(str) {
+  return '> ' + str;
+};
+
+/**
+ * Create a markdown-formatted `<code></code>` snippet.
+ *
+ * ```js
+ * utils.code('var foo = bar;');
+ * //=> '`var foo = bar;`'
+ * ```
+ *
+ * @name code
+ * @param  {String} `str`
+ * @api public
+ */
+
+exports.code = function code(str) {
+  return '`' + str + '`';
+};
+
+/**
+ * Create markdown-formatted `<del></del>`.
+ *
+ * ```js
+ * utils.del('text');
+ * //=> '~~text~~'
+ * ```
+ *
+ * @name del
+ * @param  {String} `str`
+ * @api public
+ */
+
+exports.del = function del(str) {
+  return '~~' + str + '~~';
+};
+
+/**
+ * Create a markdown-formatted em.
+ *
+ * ```js
+ * utils.em('This is emphasized');
+ * //=> '_This is emphasized_'
+ * ```
+ *
+ * @name em
+ * @param  {String} `str`
+ * @api public
+ */
+
+exports.em = function em(str) {
+  return '_' + str + '_';
+};
+
+/**
+ * Create a markdown-formatted heading.
+ *
+ * ```js
+ * utils.h(1, 'This is a heading');
+ * //=> '# This is a heading'
+ * ```
+ *
+ * @name h
+ * @param  {String} `str`
+ * @param  {Number} `level`
+ * @api public
+ */
+
+exports.h = function h(level, str) {
+  return exports.heading(str, level);
+};
+
+/**
+ * Create a markdown-formatted h1 heading.
+ *
+ * ```js
+ * utils.h1('This is a heading');
+ * //=> '# This is a heading'
+ * ```
+ *
+ * @name h1
+ * @param  {String} `str`
+ * @api public
+ */
+
+exports.h1 = function h1(str) {
+  return '# ' + str;
+};
+
+/**
+ * Create a markdown-formatted h2 heading.
+ *
+ * ```js
+ * utils.h2('This is a heading');
+ * //=> '## This is a heading'
+ * ```
+ *
+ * @name h2
+ * @param  {String} `str`
+ * @api public
+ */
+
+exports.h2 = function h2(str) {
+  return '## ' + str;
+};
+
+/**
+ * Create a markdown-formatted h3 heading.
+ *
+ * ```js
+ * utils.h3('This is a heading');
+ * //=> '### This is a heading'
+ * ```
+ *
+ * @name h3
+ * @param  {String} `str`
+ * @api public
+ */
+
+exports.h3 = function h3(str) {
+  return '### ' + str;
+};
+
+/**
+ * Create a markdown-formatted h4 heading.
+ *
+ * ```js
+ * utils.h4('This is a heading');
+ * //=> '#### This is a heading'
+ * ```
+ *
+ * @name h4
+ * @param  {String} `str`
+ * @api public
+ */
+
+exports.h4 = function h4(str) {
+  return '#### ' + str;
+};
+
+/**
+ * Create a markdown-formatted h5 heading.
+ *
+ * ```js
+ * utils.h5('This is a heading');
+ * //=> '##### This is a heading'
+ * ```
+ *
+ * @name h5
+ * @param  {String} `str`
+ * @api public
+ */
+
+exports.h5 = function h5(str) {
+  return '##### ' + str;
+};
+
+/**
+ * Create a markdown-formatted h6 heading.
+ *
+ * ```js
+ * utils.h6('This is a heading');
+ * //=> '###### This is a heading'
+ * ```
+ *
+ * @name h6
+ * @param  {String} `str`
+ * @api public
+ */
+
+exports.h6 = function h6(str) {
+  return '###### ' + str;
+};
+
+/**
+ * Create a markdown-formatted heading.
+ *
+ * ```js
+ * utils.heading('This is a heading', 1);
+ * //=> '# This is a heading'
+ * ```
+ *
+ * @name heading
+ * @param  {String} `str`
+ * @param  {Number} `level`
+ * @api public
+ */
+
+exports.heading = function heading(str, level) {
+  return exports['h' + (level || 1)](str);
+};
+
+/**
+ * Create a markdown-formatted horizontal rule.
+ *
+ * ```js
+ * utils.hr();
+ * //=> '***'
+ * ```
+ *
+ * @name hr
+ * @param  {String} `str` Alternate string to use. Default is `***` to avoid collision with `---` which is used for front matter.
+ * @api public
+ */
+
+exports.hr = function hr(str) {
+  return str || '***';
+};
+
+/**
+ * Create a markdown-formatted image from the given values.
+ *
+ * ```js
+ * utils.image(alt, src);
+ * //=> ![Build Status](https://travis-ci.org/jonschlinkert/template.svg)
+ *
+ * utils.image(alt, src, title);
+ * //=> ![Build Status](https://travis-ci.org/jonschlinkert/template.svg "This is title of image!")
+ * ```
+ *
+ * @name image
+ * @param  {String} `alt`
+ * @param  {String} `src`
+ * @param  {String} `title`
+ * @api public
+ */
+
+exports.image = function image(alt, src, title) {
+  title = title ? ' "' + title + '"' : '';
+  return '![' + alt + '](' + src + title + ')';
+};
+
+/**
+ * Create a markdown-formatted link from the given values.
+ *
+ * ```js
+ * utils.link('fs-utils', 'https://github.com/assemble/fs-utils', 'hover title');
+ * //=> [fs-utils](https://github.com/assemble/fs-utils "hover title")
+ * ```
+ *
+ * @name link
+ * @param  {String} `anchor`
+ * @param  {String} `href`
+ * @param  {String} `title`
+ * @api public
+ */
+
+exports.link = function link(anchor, href, title) {
+  title = title ? ' "' + title + '"' : '';
+  return '[' + anchor + '](' + href + title + ')';
+};
+
+/**
+ * Returns a function to generate a plain-text/markdown list-item,
+ * allowing options to be cached for subsequent calls.
+ *
+ * ```js
+ * var li = listitem(options);
+ *
+ * li(0, 'Level 0 list item');
+ * //=> '- Level 0 list item'
+ *
+ * li(1, 'Level 1 list item');
+ * //=> '  * Level 1 list item'
+ *
+ * li(2, 'Level 2 list item');
+ * //=> '    + Level 2 list item'
+ * ```
+ *
+ * @name .li
+ * @param  {String} `options`
+ *   @option {Boolean} [options] `nobullet` Pass true if you only want the list iten and identation, but no bullets.
+ *   @option {String} [options] `indent` The amount of leading indentation to use. default is `  `.
+ *   @option {String|Array} [options] `chars` If a string is passed, [expand-range] will be used to generate an array of bullets (visit [expand-range] to see all options.) Or directly pass an array of bullets, numbers, letters or other characters to use for each list item. Default `['-', '*', '+', '~']`
+ * @param {Function} `fn` pass a function [expand-range] to modify the bullet for an item as it's generated. See the [examples].
+ * @api public
+ */
+
+exports.li = function li(str, lvl, opts, fn) {
+  return listitem(opts, fn)(lvl, str);
+};
+
+/**
+ * Create a markdown-formatted `<pre><code></code></pre>` snippet with or without lang.
+ *
+ * ```js
+ * utils.pre('var foo = bar;');
+ * ```
+ * Results in:
+ *
+ * ```html
+ * <pre>
+ * var foo = bar;
+ * </pre>
+ * ```
+ *
+ * @name pre
+ * @param  {String} `str`
+ * @param  {String} `language`
+ * @api public
+ */
+
+exports.pre = function pre(str) {
+  if (typeof str !== 'string') {
+    throw new TypeError('markdown-pre expects a string.');
+  }
+
+  var code = '';
+  code += '<pre>'
+  code += '\n';
+  code += str;
+  code += '\n';
+  code += '</pre>';
+  return code;
+};
+
+/**
+ * Create a markdown-formatted code snippet with or without `lang`.
+ *
+ * ```js
+ * utils.gfm('var foo = bar;', 'js');
+ * ```
+ * Results in:
+ *
+ * <pre>
+ * ```js
+ * var foo = bar;
+ * ```
+ * </pre>
+ *
+ * @name pre
+ * @param  {String} `str`
+ * @param  {String} `language`
+ * @api public
+ */
+
+exports.gfm = function gfm(str, lang) {
+  if (typeof str !== 'string') {
+    throw new TypeError('markdown-gfm expects a string.');
+  }
+  return codeBlock(str, lang);
+};
+
+/**
+ * Create a markdown-formatted reference link from the given values.
+ *
+ * ```js
+ * utils.reference('template', 'https://github/jonschlinkert/template', 'Make stuff!');
+ * //=> [template]: https://github/jonschlinkert/template "Make stuff!"
+ * ```
+ *
+ * @name reference
+ * @param  {String} `id`
+ * @param  {String} `url`
+ * @param  {String} `title`
+ * @api public
+ */
+
+exports.reference = function reference(id, url, title) {
+  title = title ? ' "' + title + '"' : '';
+  return '[' + id + ']: ' + url + title;
+};
+
+/**
+ * Create markdown-formatted bold text.
+ *
+ * ```js
+ * utils.strong('This is bold');
+ * //=> '**This is bold**'
+ * ```
+ *
+ * @name strong
+ * @param  {String} `str`
+ * @api public
+ */
+
+exports.strong = function strong(str) {
+  return '**' + str + '**';
+};
+
+/**
+ * Create a markdown-formatted todo item.
+ *
+ * ```js
+ * utils.todo('this is a todo.');
+ * //=> '- [ ] this is a todo'
+ *
+ * utils.todo('this is a completed todo.', true);
+ * //=> '- [x] this is a todo'
+ * ```
+ *
+ * @name todo
+ * @param  {String} `str`
+ * @api public
+ */
+
+exports.todo = function todo(str, checked) {
+  return (checked ? '- [x] ' : '- [ ] ') + str;
+};
+
+
+},{"array-slice":265,"is-number":266,"list-item":267,"to-gfm-code-block":278}],265:[function(require,module,exports){
+arguments[4][101][0].apply(exports,arguments)
+},{"dup":101}],266:[function(require,module,exports){
+/*!
+ * is-number <https://github.com/jonschlinkert/is-number>
+ *
+ * Copyright (c) 2014-2015, Jon Schlinkert.
+ * Licensed under the MIT License.
+ */
+
+'use strict';
+
+module.exports = function isNumber(n) {
+  return (!!(+n) && !Array.isArray(n)) && isFinite(n)
+    || n === '0'
+    || n === 0;
+};
+
+},{}],267:[function(require,module,exports){
+/*!
+ * list-item <https://github.com/jonschlinkert/list-item>
+ *
+ * Copyright (c) 2015, Jon Schlinkert.
+ * Licensed under the MIT License.
+ */
+
+'use strict';
+
+var isNumber = require('is-number');
+var expand = require('expand-range');
+var repeat = require('repeat-string');
+
+/**
+ * Expose `listitem`
+ */
+
+module.exports = listitem;
+
+/**
+ * Returns a function to generate a plain-text/markdown list-item,
+ * allowing options to be cached for subsequent calls.
+ *
+ * ```js
+ * var li = listitem(options);
+ *
+ * li(0, 'Level 0 list item');
+ * //=> '- Level 0 list item'
+ *
+ * li(1, 'Level 1 list item');
+ * //=> '  * Level 1 list item'
+ *
+ * li(2, 'Level 2 list item');
+ * //=> '    + Level 2 list item'
+ * ```
+ *
+ * @param  {String} `options`
+ *   @option {Boolean} [options] `nobullet` Pass true if you only want the list iten and identation, but no bullets.
+ *   @option {String} [options] `indent` The amount of leading indentation to use. default is `  `.
+ *   @option {String|Array} [options] `chars` If a string is passed, [expand-range] will be used to generate an array of bullets (visit [expand-range] to see all options.) Or directly pass an array of bullets, numbers, letters or other characters to use for each list item. Default `['-', '*', '+']`
+ * @param {Function} `fn` pass a function [expand-range] to modify the bullet for an item as it's generated. See the [examples].
+ * @api public
+ */
+
+function listitem(opts, fn) {
+  if (typeof opts === 'function') {
+    fn = opts;
+    opts = {};
+  }
+
+  opts = opts || {};
+  var chars = character(opts, fn);
+
+  return function(lvl, str, sublvl) {
+    if (!isNumber(lvl)) {
+      throw new Error('[listitem]: invalid arguments.');
+    }
+
+    lvl = isNumber(lvl) ? +lvl : 0;
+    var ch = chars(sublvl);
+    var bullet = ch ? ch[lvl % ch.length] : '';
+    var indent = typeof opts.indent !== 'string'
+      ? (lvl > 0 ? '  ' : '')
+      : opts.indent;
+
+    var prefix = !opts.nobullet
+      ? bullet + ' '
+      : '';
+
+    var res = '';
+    res += repeat(indent, lvl);
+    res += prefix;
+    res += str;
+    return res;
+  };
+}
+
+/**
+ * Generate and cache the array of characters to use as
+ * bullets.
+ *
+ * - http://spec.commonmark.org/0.19/#list-items
+ * - https://daringfireball.net/projects/markdown/syntax#list
+ * - https://help.github.com/articles/markdown-basics/#lists
+ *
+ * TODO: split this out into simpler functions.
+ *
+ * @param  {Object} `opts` Options to pass to [expand-range]
+ * @param  {Function} `fn`
+ * @return {Array}
+ */
+
+function character(opts, fn) {
+  var chars = opts.chars || ['-', '*', '+'];
+  if (typeof chars === 'string') {
+    opts = Object.create(opts || {});
+    return function (sublvl) {
+      return expand(chars, opts, function(ch) {
+        return fn ? fn(ch, sublvl) : ch;
+      });
+    };
+  }
+  if (typeof fn === 'function') {
+    return wrap(fn, chars);
+  }
+  return function () {
+    return chars;
+  };
+}
+
+function wrap (fn, chars) {
+  return function (/*sublvl*/) {
+    var args = [].slice.call(arguments);
+    return chars.map(function (/*ch*/) {
+      var ctx = args.concat.apply([], arguments);
+      return fn.apply(fn, ctx);
+    });
+  };
+}
+
+},{"expand-range":268,"is-number":275,"repeat-string":277}],268:[function(require,module,exports){
+/*!
+ * expand-range <https://github.com/jonschlinkert/expand-range>
+ *
+ * Copyright (c) 2014-2015, Jon Schlinkert.
+ * Licensed under the MIT license.
+ */
+
+'use strict';
+
+var fill = require('fill-range');
+
+module.exports = function expandRange(str, options, fn) {
+  if (typeof str !== 'string') {
+    throw new TypeError('expand-range expects a string.');
+  }
+
+  if (typeof options === 'function') {
+    fn = options;
+    options = {};
+  }
+
+  if (typeof options === 'boolean') {
+    options = {};
+    options.makeRe = true;
+  }
+
+  // create arguments to pass to fill-range
+  var opts = options || {};
+  var args = str.split('..');
+  var len = args.length;
+  if (len > 3) { return str; }
+
+  // if only one argument, it can't expand so return it
+  if (len === 1) { return args; }
+
+  // if `true`, tell fill-range to regexify the string
+  if (typeof fn === 'boolean' && fn === true) {
+    opts.makeRe = true;
+  }
+
+  args.push(opts);
+  return fill.apply(fill, args.concat(fn));
+};
+
+},{"fill-range":269}],269:[function(require,module,exports){
+/*!
+ * fill-range <https://github.com/jonschlinkert/fill-range>
+ *
+ * Copyright (c) 2014-2015, Jon Schlinkert.
+ * Licensed under the MIT License.
+ */
+
+'use strict';
+
+var isObject = require('isobject');
+var isNumber = require('is-number');
+var randomize = require('randomatic');
+var repeatStr = require('repeat-string');
+var repeat = require('repeat-element');
+
+/**
+ * Expose `fillRange`
+ */
+
+module.exports = fillRange;
+
+/**
+ * Return a range of numbers or letters.
+ *
+ * @param  {String} `a` Start of the range
+ * @param  {String} `b` End of the range
+ * @param  {String} `step` Increment or decrement to use.
+ * @param  {Function} `fn` Custom function to modify each element in the range.
+ * @return {Array}
+ */
+
+function fillRange(a, b, step, options, fn) {
+  if (a == null || b == null) {
+    throw new Error('fill-range expects the first and second args to be strings.');
+  }
+
+  if (typeof step === 'function') {
+    fn = step; options = {}; step = null;
+  }
+
+  if (typeof options === 'function') {
+    fn = options; options = {};
+  }
+
+  if (isObject(step)) {
+    options = step; step = '';
+  }
+
+  var expand, regex = false, sep = '';
+  var opts = options || {};
+
+  if (typeof opts.silent === 'undefined') {
+    opts.silent = true;
+  }
+
+  step = step || opts.step;
+
+  // store a ref to unmodified arg
+  var origA = a, origB = b;
+
+  b = (b.toString() === '-0') ? 0 : b;
+
+  if (opts.optimize || opts.makeRe) {
+    step = step ? (step += '~') : step;
+    expand = true;
+    regex = true;
+    sep = '~';
+  }
+
+  // handle special step characters
+  if (typeof step === 'string') {
+    var match = stepRe().exec(step);
+
+    if (match) {
+      var i = match.index;
+      var m = match[0];
+
+      // repeat string
+      if (m === '+') {
+        return repeat(a, b);
+
+      // randomize a, `b` times
+      } else if (m === '?') {
+        return [randomize(a, b)];
+
+      // expand right, no regex reduction
+      } else if (m === '>') {
+        step = step.substr(0, i) + step.substr(i + 1);
+        expand = true;
+
+      // expand to an array, or if valid create a reduced
+      // string for a regex logic `or`
+      } else if (m === '|') {
+        step = step.substr(0, i) + step.substr(i + 1);
+        expand = true;
+        regex = true;
+        sep = m;
+
+      // expand to an array, or if valid create a reduced
+      // string for a regex range
+      } else if (m === '~') {
+        step = step.substr(0, i) + step.substr(i + 1);
+        expand = true;
+        regex = true;
+        sep = m;
+      }
+    } else if (!isNumber(step)) {
+      if (!opts.silent) {
+        throw new TypeError('fill-range: invalid step.');
+      }
+      return null;
+    }
+  }
+
+  if (/[.&*()[\]^%$#@!]/.test(a) || /[.&*()[\]^%$#@!]/.test(b)) {
+    if (!opts.silent) {
+      throw new RangeError('fill-range: invalid range arguments.');
+    }
+    return null;
+  }
+
+  // has neither a letter nor number, or has both letters and numbers
+  // this needs to be after the step logic
+  if (!noAlphaNum(a) || !noAlphaNum(b) || hasBoth(a) || hasBoth(b)) {
+    if (!opts.silent) {
+      throw new RangeError('fill-range: invalid range arguments.');
+    }
+    return null;
+  }
+
+  // validate arguments
+  var isNumA = isNumber(zeros(a));
+  var isNumB = isNumber(zeros(b));
+
+  if ((!isNumA && isNumB) || (isNumA && !isNumB)) {
+    if (!opts.silent) {
+      throw new TypeError('fill-range: first range argument is incompatible with second.');
+    }
+    return null;
+  }
+
+  // by this point both are the same, so we
+  // can use A to check going forward.
+  var isNum = isNumA;
+  var num = formatStep(step);
+
+  // is the range alphabetical? or numeric?
+  if (isNum) {
+    // if numeric, coerce to an integer
+    a = +a; b = +b;
+  } else {
+    // otherwise, get the charCode to expand alpha ranges
+    a = a.charCodeAt(0);
+    b = b.charCodeAt(0);
+  }
+
+  // is the pattern descending?
+  var isDescending = a > b;
+
+  // don't create a character class if the args are < 0
+  if (a < 0 || b < 0) {
+    expand = false;
+    regex = false;
+  }
+
+  // detect padding
+  var padding = isPadded(origA, origB);
+  var res, pad, arr = [];
+  var ii = 0;
+
+  // character classes, ranges and logical `or`
+  if (regex) {
+    if (shouldExpand(a, b, num, isNum, padding, opts)) {
+      // make sure the correct separator is used
+      if (sep === '|' || sep === '~') {
+        sep = detectSeparator(a, b, num, isNum, isDescending);
+      }
+      return wrap([origA, origB], sep, opts);
+    }
+  }
+
+  while (isDescending ? (a >= b) : (a <= b)) {
+    if (padding && isNum) {
+      pad = padding(a);
+    }
+
+    // custom function
+    if (typeof fn === 'function') {
+      res = fn(a, isNum, pad, ii++);
+
+    // letters
+    } else if (!isNum) {
+      if (regex && isInvalidChar(a)) {
+        res = null;
+      } else {
+        res = String.fromCharCode(a);
+      }
+
+    // numbers
+    } else {
+      res = formatPadding(a, pad);
+    }
+
+    // add result to the array, filtering any nulled values
+    if (res !== null) arr.push(res);
+
+    // increment or decrement
+    if (isDescending) {
+      a -= num;
+    } else {
+      a += num;
+    }
+  }
+
+  // now that the array is expanded, we need to handle regex
+  // character classes, ranges or logical `or` that wasn't
+  // already handled before the loop
+  if ((regex || expand) && !opts.noexpand) {
+    // make sure the correct separator is used
+    if (sep === '|' || sep === '~') {
+      sep = detectSeparator(a, b, num, isNum, isDescending);
+    }
+    if (arr.length === 1 || a < 0 || b < 0) { return arr; }
+    return wrap(arr, sep, opts);
+  }
+
+  return arr;
+}
+
+/**
+ * Wrap the string with the correct regex
+ * syntax.
+ */
+
+function wrap(arr, sep, opts) {
+  if (sep === '~') { sep = '-'; }
+  var str = arr.join(sep);
+  var pre = opts && opts.regexPrefix;
+
+  // regex logical `or`
+  if (sep === '|') {
+    str = pre ? pre + str : str;
+    str = '(' + str + ')';
+  }
+
+  // regex character class
+  if (sep === '-') {
+    str = (pre && pre === '^')
+      ? pre + str
+      : str;
+    str = '[' + str + ']';
+  }
+  return [str];
+}
+
+/**
+ * Check for invalid characters
+ */
+
+function isCharClass(a, b, step, isNum, isDescending) {
+  if (isDescending) { return false; }
+  if (isNum) { return a <= 9 && b <= 9; }
+  if (a < b) { return step === 1; }
+  return false;
+}
+
+/**
+ * Detect the correct separator to use
+ */
+
+function shouldExpand(a, b, num, isNum, padding, opts) {
+  if (isNum && (a > 9 || b > 9)) { return false; }
+  return !padding && num === 1 && a < b;
+}
+
+/**
+ * Detect the correct separator to use
+ */
+
+function detectSeparator(a, b, step, isNum, isDescending) {
+  var isChar = isCharClass(a, b, step, isNum, isDescending);
+  if (!isChar) {
+    return '|';
+  }
+  return '~';
+}
+
+/**
+ * Correctly format the step based on type
+ */
+
+function formatStep(step) {
+  return Math.abs(step >> 0) || 1;
+}
+
+/**
+ * Format padding, taking leading `-` into account
+ */
+
+function formatPadding(ch, pad) {
+  var res = pad ? pad + ch : ch;
+  if (pad && ch.toString().charAt(0) === '-') {
+    res = '-' + pad + ch.toString().substr(1);
+  }
+  return res.toString();
+}
+
+/**
+ * Check for invalid characters
+ */
+
+function isInvalidChar(str) {
+  var ch = toStr(str);
+  return ch === '\\'
+    || ch === '['
+    || ch === ']'
+    || ch === '^'
+    || ch === '('
+    || ch === ')'
+    || ch === '`';
+}
+
+/**
+ * Convert to a string from a charCode
+ */
+
+function toStr(ch) {
+  return String.fromCharCode(ch);
+}
+
+
+/**
+ * Step regex
+ */
+
+function stepRe() {
+  return /\?|>|\||\+|\~/g;
+}
+
+/**
+ * Return true if `val` has either a letter
+ * or a number
+ */
+
+function noAlphaNum(val) {
+  return /[a-z0-9]/i.test(val);
+}
+
+/**
+ * Return true if `val` has both a letter and
+ * a number (invalid)
+ */
+
+function hasBoth(val) {
+  return /[a-z][0-9]|[0-9][a-z]/i.test(val);
+}
+
+/**
+ * Normalize zeros for checks
+ */
+
+function zeros(val) {
+  if (/^-*0+$/.test(val.toString())) {
+    return '0';
+  }
+  return val;
+}
+
+/**
+ * Return true if `val` has leading zeros,
+ * or a similar valid pattern.
+ */
+
+function hasZeros(val) {
+  return /[^.]\.|^-*0+[0-9]/.test(val);
+}
+
+/**
+ * If the string is padded, returns a curried function with
+ * the a cached padding string, or `false` if no padding.
+ *
+ * @param  {*} `origA` String or number.
+ * @return {String|Boolean}
+ */
+
+function isPadded(origA, origB) {
+  if (hasZeros(origA) || hasZeros(origB)) {
+    var alen = length(origA);
+    var blen = length(origB);
+
+    var len = alen >= blen
+      ? alen
+      : blen;
+
+    return function (a) {
+      return repeatStr('0', len - length(a));
+    };
+  }
+  return false;
+}
+
+/**
+ * Get the string length of `val`
+ */
+
+function length(val) {
+  return val.toString().length;
+}
+
+},{"is-number":270,"isobject":271,"randomatic":272,"repeat-element":274,"repeat-string":277}],270:[function(require,module,exports){
+arguments[4][266][0].apply(exports,arguments)
+},{"dup":266}],271:[function(require,module,exports){
+arguments[4][77][0].apply(exports,arguments)
+},{"dup":77}],272:[function(require,module,exports){
+/*!
+ * randomatic <https://github.com/jonschlinkert/randomatic>
+ *
+ * Copyright (c) 2014-2015, Jon Schlinkert.
+ * Licensed under the MIT License (MIT)
+ *
+ * Many changes have been made, but this was originally
+ * inspired by <http://stackoverflow.com/a/10727155/1267639>
+ */
+
+'use strict';
+
+var isNumber = require('is-number');
+var typeOf = require('kind-of');
+
+/**
+ * Expose `randomatic`
+ */
+
+module.exports = randomatic;
+
+/**
+ * Available mask characters
+ */
+
+var type = {
+  lower: 'abcdefghijklmnopqrstuvwxyz',
+  upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+  number: '0123456789',
+  special: '~!@#$%^&()_+-={}[];\',.'
+};
+
+type.all = type.lower + type.upper + type.number;
+
+/**
+ * Generate random character sequences of a specified `length`,
+ * based on the given `pattern`.
+ *
+ * @param {String} `pattern` The pattern to use for generating the random string.
+ * @param {String} `length` The length of the string to generate.
+ * @param {String} `options`
+ * @return {String}
+ * @api public
+ */
+
+function randomatic(pattern, length, options) {
+  if (typeof pattern === 'undefined') {
+    throw new Error('randomatic expects a string or number.');
+  }
+
+  var custom = false;
+  if (arguments.length === 1) {
+    if (typeof pattern === 'string') {
+      length = pattern.length;
+
+    } else if (isNumber(pattern)) {
+      options = {}; length = pattern; pattern = '*';
+    }
+  }
+
+  if(typeOf(length) === 'object' && length.hasOwnProperty('chars')) {
+    options = length;
+    pattern = options.chars;
+    length = pattern.length;
+    custom = true;
+  }
+
+  var opts = options || {};
+  var mask = '';
+  var res = '';
+
+  // Characters to be used
+  if (pattern.indexOf('?') !== -1) mask += opts.chars;
+  if (pattern.indexOf('a') !== -1) mask += type.lower;
+  if (pattern.indexOf('A') !== -1) mask += type.upper;
+  if (pattern.indexOf('0') !== -1) mask += type.number;
+  if (pattern.indexOf('!') !== -1) mask += type.special;
+  if (pattern.indexOf('*') !== -1) mask += type.all;
+  if (custom) mask += pattern;
+
+  while (length--) {
+    res += mask.charAt(parseInt(Math.random() * mask.length));
+  }
+
+  return res;
+};
+
+},{"is-number":270,"kind-of":273}],273:[function(require,module,exports){
+var toString = Object.prototype.toString;
+
+/**
+ * Get the native `typeof` a value.
+ *
+ * @param  {*} `val`
+ * @return {*} Native javascript type
+ */
+
+module.exports = function kindOf(val) {
+  if (val === undefined) {
+    return 'undefined';
+  }
+  if (val === null) {
+    return 'null';
+  }
+  if (val === true || val === false || val instanceof Boolean) {
+    return 'boolean';
+  }
+  if (typeof val !== 'object') {
+    return typeof val;
+  }
+  if (Array.isArray(val)) {
+    return 'array';
+  }
+
+  var type = toString.call(val);
+
+  if (val instanceof RegExp || type === '[object RegExp]') {
+    return 'regexp';
+  }
+  if (val instanceof Date || type === '[object Date]') {
+    return 'date';
+  }
+  if (type === '[object Function]') {
+    return 'function';
+  }
+  if (type === '[object Arguments]') {
+    return 'arguments';
+  }
+  if (typeof Buffer !== 'undefined' && Buffer.isBuffer(val)) {
+    return 'buffer';
+  }
+  return type.slice(8, -1).toLowerCase();
+};
+
+},{}],274:[function(require,module,exports){
+/*!
+ * repeat-element <https://github.com/jonschlinkert/repeat-element>
+ *
+ * Copyright (c) 2015 Jon Schlinkert.
+ * Licensed under the MIT license.
+ */
+
+'use strict';
+
+module.exports = function repeat(ele, num) {
+  var arr = new Array(num);
+
+  for (var i = 0; i < num; i++) {
+    arr[i] = ele;
+  }
+
+  return arr;
+};
+
+},{}],275:[function(require,module,exports){
+/*!
+ * is-number <https://github.com/jonschlinkert/is-number>
+ *
+ * Copyright (c) 2014-2015, Jon Schlinkert.
+ * Licensed under the MIT License.
+ */
+
+'use strict';
+
+var typeOf = require('kind-of');
+
+module.exports = function isNumber(num) {
+  var type = typeOf(num);
+  if (type !== 'number' && type !== 'string') {
+    return false;
+  }
+  var n = +num;
+  return (n - n + 1) >= 0 && num !== '';
+};
+
+},{"kind-of":276}],276:[function(require,module,exports){
+arguments[4][273][0].apply(exports,arguments)
+},{"dup":273}],277:[function(require,module,exports){
+/*!
+ * repeat-string <https://github.com/jonschlinkert/repeat-string>
+ *
+ * Copyright (c) 2014-2015, Jon Schlinkert.
+ * Licensed under the MIT License.
+ */
+
+'use strict';
+
+/**
+ * Expose `repeat`
+ */
+
+module.exports = repeat;
+
+/**
+ * Repeat the given `string` the specified `number`
+ * of times.
+ *
+ * **Example:**
+ *
+ * ```js
+ * var repeat = require('repeat-string');
+ * repeat('A', 5);
+ * //=> AAAAA
+ * ```
+ *
+ * @param {String} `string` The string to repeat
+ * @param {Number} `number` The number of times to repeat the string
+ * @return {String} Repeated string
+ * @api public
+ */
+
+function repeat(str, num) {
+  if (typeof str !== 'string') {
+    throw new TypeError('repeat-string expects a string.');
+  }
+
+  if (num === 1) return str;
+  if (num === 2) return str + str;
+
+  var max = str.length * num;
+  if (cache !== str || typeof cache === 'undefined') {
+    cache = str;
+    res = '';
+  }
+
+  while (max > res.length && num > 0) {
+    if (num & 1) {
+      res += str;
+    }
+
+    num >>= 1;
+    if (!num) break;
+    str += str;
+  }
+
+  return res.substr(0, max);
+}
+
+/**
+ * Results cache
+ */
+
+var res = '';
+var cache;
+
+},{}],278:[function(require,module,exports){
+/*!
+ * to-gfm-code-block <https://github.com/jonschlinkert/to-gfm-code-block>
+ *
+ * Copyright (c) 2015, Jon Schlinkert.
+ * Licensed under the MIT License.
+ */
+
+'use strict';
+
+module.exports = function pre(str, lang) {
+  if (typeof str !== 'string') {
+    throw new TypeError('markdown-pre expects a string.');
+  }
+
+  var code = '';
+  code += '```' + (typeof lang === 'string' ? lang : '');
+  code += '\n';
+  code += str;
+  code += '\n';
+  code += '```';
+  return code;
+};
+
+},{}],279:[function(require,module,exports){
+/*!
+ * right-pad-values <https://github.com/jonschlinkert/right-pad-values>
+ *
+ * Copyright (c) 2015, Jon Schlinkert.
+ * Licensed under the MIT License.
+ */
+
+'use strict';
+
+var longest = require('longest-value');
+var pad = require('pad-right');
+
+module.exports = function rightPadValues(obj, prop) {
+  if (typeof obj !== 'object') {
+    throw new TypeError('right-pad-values expects an object or array.');
+  }
+
+  if (Array.isArray(obj)) {
+    return arrayValues(obj, prop);
+  }
+  return objectValues(obj);
+};
+
+function arrayValues(arr, prop) {
+  var max = longest(arr, prop).length;
+  var len = arr.length;
+  var res = new Array(len);
+
+  while (len--) {
+    var ele = arr[len];
+    var val = ele[prop].toString();
+    ele[prop] = pad(val, max, ' ');
+    res[len] = ele;
+  }
+  return res;
+}
+
+function objectValues(obj) {
+  var max = longest(obj).length;
+  var res = {};
+
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      var val = obj[key];
+      res[key] = pad(val, max, ' ');
+    }
+  }
+  return res;
+}
+
+},{"longest-value":280,"pad-right":282}],280:[function(require,module,exports){
+/*!
+ * longest-value <https://github.com/jonschlinkert/longest-value>
+ *
+ * Copyright (c) 2015, Jon Schlinkert.
+ * Licensed under the MIT License.
+ */
+
+'use strict';
+
+var longest = require('longest');
+
+module.exports = function longestValue(obj, prop) {
+  if (typeof obj !== 'object') {
+    throw new TypeError('longest-value expects an object or array.');
+  }
+  if (Array.isArray(obj)) {
+    return longest(arrayValues(obj, prop));
+  }
+  return longest(objectValues(obj));
+};
+
+function objectValues(obj) {
+  var values = [];
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      values.push(obj[key]);
+    }
+  }
+  return values;
+}
+
+function arrayValues(arr, prop) {
+  var values = [];
+  var len = arr.length;
+  while (len--) {
+    var obj = arr[len];
+    if (obj.hasOwnProperty(prop)) {
+      values.push(arr[len][prop]);
+    } else {
+      throw new Error('longest-value cannot find ' + prop + ' in array objects.');
+    }
+  }
+  return values;
+}
+
+},{"longest":281}],281:[function(require,module,exports){
+/*!
+ * longest <https://github.com/jonschlinkert/longest>
+ *
+ * Copyright (c) 2014-2015, Jon Schlinkert.
+ * Licensed under the MIT License.
+ */
+
+'use strict';
+
+module.exports = function(arr) {
+  if (!arr) {
+    return null;
+  }
+
+  var len = arr.length;
+  if (!len) {
+    return null;
+  }
+
+  var c = 0;
+  var i = 0;
+  var ele;
+  var elen;
+  var res;
+
+  for (; i < len; i++) {
+    ele = arr[i].toString();
+    elen = ele.length;
+
+    if (elen > c) {
+      res = ele;
+      c = elen;
+    }
+  }
+
+  return res;
+};
+
+},{}],282:[function(require,module,exports){
+'use strict';
+
+var repeat = require('repeat-string');
+
+module.exports = function padLeft(val, num, str) {
+  var padding = '';
+  var diff = num - val.length;
+
+  // Breakpoints based on benchmarks to use the fastest approach
+  // for the given number of zeros
+  if (diff <= 5 && !str) {
+    padding = '00000';
+  } else if (diff <= 25 && !str) {
+    padding = '000000000000000000000000000';
+  } else {
+    return val + repeat(str || '0', diff);
+  }
+
+  return val + padding.slice(0, diff);
+};
+
+},{"repeat-string":283}],283:[function(require,module,exports){
+arguments[4][277][0].apply(exports,arguments)
+},{"dup":277}],284:[function(require,module,exports){
 (function (__filename){
 'use strict';
 
@@ -34471,7 +36333,7 @@ function camelcase(str) {
 module.exports = lazyCache;
 
 }).call(this,"/Users/doowb/work/doowb/update-contributors/node_modules/lazy-cache/index.js")
-},{}],210:[function(require,module,exports){
+},{}],285:[function(require,module,exports){
 'use strict';
 
 var isExtendable = require('is-extendable');
@@ -34522,11 +36384,11 @@ function isObject(val) {
 
 module.exports = mixinDeep;
 
-},{"for-in":211,"is-extendable":212}],211:[function(require,module,exports){
+},{"for-in":286,"is-extendable":287}],286:[function(require,module,exports){
 arguments[4][174][0].apply(exports,arguments)
-},{"dup":174}],212:[function(require,module,exports){
+},{"dup":174}],287:[function(require,module,exports){
 arguments[4][5][0].apply(exports,arguments)
-},{"dup":5}],213:[function(require,module,exports){
+},{"dup":5}],288:[function(require,module,exports){
 /*!
  * object.omit <https://github.com/jonschlinkert/object.omit>
  *
@@ -34568,13 +36430,13 @@ module.exports = function omit(obj, keys) {
   return res;
 };
 
-},{"for-own":214,"is-extendable":216}],214:[function(require,module,exports){
+},{"for-own":289,"is-extendable":291}],289:[function(require,module,exports){
 arguments[4][173][0].apply(exports,arguments)
-},{"dup":173,"for-in":215}],215:[function(require,module,exports){
+},{"dup":173,"for-in":290}],290:[function(require,module,exports){
 arguments[4][174][0].apply(exports,arguments)
-},{"dup":174}],216:[function(require,module,exports){
+},{"dup":174}],291:[function(require,module,exports){
 arguments[4][5][0].apply(exports,arguments)
-},{"dup":5}],217:[function(require,module,exports){
+},{"dup":5}],292:[function(require,module,exports){
 /*!
  * parse-github-url <https://github.com/jonschlinkert/parse-github-url>
  *
@@ -34693,6 +36555,7 @@ function repo(str) {
 }
 
 function user(str) {
+  if (!str || !str.length) return null;
   if (str.indexOf(':') !== -1) {
     var segs = str.split(':');
     return segs[segs.length - 1];
