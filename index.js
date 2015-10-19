@@ -5,7 +5,7 @@ import GitHub from 'github-base';
 import DataStore from 'data-store';
 import ghUrl from 'parse-github-url';
 import ask from 'ask-for-github-auth';
-// import ghContrib from 'github-contributors';
+import ghContrib from 'github-contributors';
 
 const store = new DataStore('update-contributors');
 
@@ -61,14 +61,7 @@ export default function(pkg, options, cb) {
     },
 
     // get contributors
-    (next) => {
-      const github = new GitHub(options);
-      github.get('/repos/:repopath/contributors', repo, (err, contributors) => {
-        if (err) return next(err);
-        next(null, contributors);
-      });
-    },
-    // async.apply(ghContrib, repo.repopath, options),
+    async.apply(ghContrib, repo.repopath, options),
 
     // get contributor information
     (contributors, next) => {
@@ -80,6 +73,9 @@ export default function(pkg, options, cb) {
       async.eachSeries(contributors, (contributor, nextContributor) => {
         github.get('/users/:login', contributor, (err, user) => {
           if (err) return nextContributor(err);
+          if (user && user.message && user.message === 'Bad credentials') {
+            return nextContributor(new Error(user.message));
+          }
           pkg.contributors.push({
             name: user.name || user.login,
             email: user.email || '',
@@ -88,18 +84,6 @@ export default function(pkg, options, cb) {
           nextContributor();
         });
       }, next);
-    },
-
-    // de-dup
-    (next) => {
-      let contributors = [];
-      pkg.contributors.forEach((contributor) => {
-        if (contributors.filter((existing) => {return existing.name === contributor.name;}).length === 0) {
-          contributors.push(contributor);
-        }
-      });
-      pkg.contributors = contributors;
-      next();
     }
   ], (err) => {
     if (err) return cb(err);
