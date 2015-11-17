@@ -79,7 +79,11 @@ module.exports =
 	
 	var _askForGithubAuth2 = _interopRequireDefault(_askForGithubAuth);
 	
-	var _githubContributors = __webpack_require__(8);
+	var _stringifyAuthor = __webpack_require__(8);
+	
+	var _stringifyAuthor2 = _interopRequireDefault(_stringifyAuthor);
+	
+	var _githubContributors = __webpack_require__(9);
 	
 	var _githubContributors2 = _interopRequireDefault(_githubContributors);
 	
@@ -101,6 +105,7 @@ module.exports =
 	 * @param  {Object} `pkg` Object representing the package.json to update.
 	 * @param  {Object} `options` Options to use for github authentication.
 	 * @param  {Object} `options.creds` Github credentials. May be a token or a username and password. If execuled [ask-for-github-auth][] will be used.
+	 * @param  {Boolean} `options.stringify` When set to `false` the contributors will be objects in the `contributors` array. Defaults to `true`.
 	 * @param {Function} `cb` Callback function that will get an `err` when an error happens or a `results` with the updated package.json object.
 	 * @api public
 	 * @name update
@@ -152,11 +157,15 @@ module.exports =
 	        if (user && user.message && user.message === 'Bad credentials') {
 	          return nextContributor(new Error(user.message));
 	        }
-	        pkg.contributors.push({
+	        var contrib = {
 	          name: user.name || user.login,
 	          email: user.email || '',
 	          url: user.html_url
-	        });
+	        };
+	        if (options.stringify !== false) {
+	          contrib = (0, _stringifyAuthor2['default'])(contrib);
+	        }
+	        pkg.contributors.push(contrib);
 	        nextContributor();
 	      });
 	    }, next);
@@ -220,6 +229,12 @@ module.exports =
 
 /***/ },
 /* 8 */
+/***/ function(module, exports) {
+
+	module.exports = require("stringify-author");
+
+/***/ },
+/* 9 */
 /***/ function(module, exports) {
 
 	module.exports = require("github-contributors");
