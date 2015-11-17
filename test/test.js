@@ -18,13 +18,30 @@ describe('update-contributors', function() {
     };
   });
 
-  it('should get contributors', function(done) {
+  it('should get contributors as strings', function(done) {
     let pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/composer-package.json')));
     upd(done)(pkg, (err, results) => {
       if (err) return done(err);
       assert(results);
       assert(Array.isArray(results.contributors));
       assert(results.contributors.length > 0);
+      results.contributors.forEach(function(contributor) {
+        assert(typeof contributor === 'string');
+      });
+      done();
+    });
+  });
+
+  it('should get contributors as objects', function(done) {
+    let pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/composer-package.json')));
+    upd(done)(pkg, { stringify: false }, (err, results) => {
+      if (err) return done(err);
+      assert(results);
+      assert(Array.isArray(results.contributors));
+      assert(results.contributors.length > 0);
+      results.contributors.forEach(function(contributor) {
+        assert(typeof contributor === 'object');
+      });
       done();
     });
   });
